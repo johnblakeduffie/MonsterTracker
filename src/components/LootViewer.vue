@@ -1,14 +1,17 @@
 <template>
   <v-layout row justify-center>
     <v-dialog dark v-model="show" persistent max-width="1500px">
-      <v-data-table dark :headers="headers" :items="monsterDrops" sort-by="grossIncomePerKill" class="elevation-1">
+      <v-data-table dark :headers="headers" :items="monsterDrops" sort-by="grossIncomePerKill" :sort-desc="true" class="elevation-1">
         <template v-slot:top>
           <v-toolbar flat dark>
             <v-toolbar-title>{{monster.name}}</v-toolbar-title>
             <v-divider class="mx-4" inset vertical></v-divider>
             <v-toolbar-title>Total Profit: {{(Math.trunc(calculatedProfit * killsPerHour)).toLocaleString()}} GP</v-toolbar-title>
             <v-divider class="mx-4" inset vertical></v-divider>
-            <v-toolbar-title>Loot Per Kill: {{(Math.trunc(calculatedProfit)).toLocaleString()}} GP</v-toolbar-title>
+            
+            <v-toolbar-title>Loot Per Kill: {{(Math.trunc(calculatedProfit)).toLocaleString()}} GP </v-toolbar-title>
+            <!-- <v-chip id="incomeChip" color="green accent-4" outlined pill> + {{(Math.trunc(calculatedProfit)).toLocaleString()}} GP</v-chip> -->
+            
             <v-spacer></v-spacer>
             <v-dialog v-model="dialog" max-width="500px">
               <template v-slot:activator="{ on }">
@@ -28,7 +31,7 @@
                         <v-text-field v-model="editedItem.name" label="Item name"></v-text-field>
                       </v-col>
                       <v-col cols="12" sm="6" md="4">
-                        <v-text-field v-model="editedItem.grossIncomePerKill" label="Quantity (Uses/Kill)"></v-text-field>
+                        <v-text-field v-model="editedItem.grossIncomePerKill" label="Gross Income Per Kill"></v-text-field>
                       </v-col>
                       <v-col cols="12" sm="6" md="4">
                         <v-text-field v-model="editedItem.sellAvg" label="Sell Average"></v-text-field>
@@ -66,24 +69,12 @@
 
 <script>
 
-/*class Monster {
-  constructor(name, src, grossIncomePerKill, dropList) {
-    this.name = name;
-    this.src = src;
-    this.grossIncomePerKill = grossIncomePerKill;
-    this.dropList = dropList;
-  }
-}*/
-
-//import $ from "jquery";
-//import monsterQuery from "../scripts/monsterQuery";
 export default {
   created() {},
   props: {
     value: Boolean,
     monster: Object,
     monsterDrops: Array,
-    //dropList: Array,
     killsPerHour: Number
   },
   computed: {
@@ -92,30 +83,6 @@ export default {
       this.monsterDrops.map(item => (total += item.grossIncomePerKill));
       return total;
     },
-    /*dropList: function () {
-      var Drops = {};
-      this.drops = DropList;
-      var monsterP = new Monster(monsterQuery.getMonster(this.monster.name));
-      var monster = {};
-      monster = monsterQuery.getMonster(this.monster.name);
-      monsterP = monsterQuery.getMonster(this.monster.name);
-      $.each(monsterP, function(key, value) {
-        console.log(key);
-        console.log(value);
-
-      });
-
-      console.log(monster);
-      fetch('http://localhost:8000/monster/' + name + '/')
-        .then(response => response.json())
-        .then((data) => {
-          //Drops = data;
-          console.log(data);
-          return data.dropList
-      })
-      console.log(monsterQuery.getMonster(this.monster.name));
-      return monsterQuery.getMonster(this.monster.name);
-    },*/
     show: {
       get() {
         return this.value;
@@ -134,7 +101,7 @@ export default {
     dialog: false,
     headers: [
       { text: "Item", align: "start", sortable: false, value: "name" },
-      { text: "Profit (gp)", value: "grossIncomePerKill" },
+      { text: "Income Per Kill (gp)", value: "grossIncomePerKill" },
       { text: "Sell Average (gp)", value: "sellAvg" },
       { text: "Drop Rate (Chance/Kill)", value: "rarity" },
       { text: "Quantity (Amount/Kill)", value: "quantityAvg" },
@@ -168,31 +135,7 @@ export default {
   }),
 
   methods: {
-    /*populateDropList() {
-      this.dropList = monsterQuery.getMonster(this.monster.name).dropList
-    },*/
     initialize() {
-      //var DropList = [];
-      //var mDrops = [];
-      //var monsterName = this.monster.name;
-      /*mDrops = monsterQuery.getMonster(this.monster.name).dropList;
-      $.each(mDrops, function(monster, index) {
-        if (monster === monsterName) {
-          $.each(index, function(key, value) {
-            
-              if (typeof value.sellAvg === 'undefined') {
-                console.log("Error for Drop: " + key);
-              } else {
-                DropList.push(value);
-              }
-
-          });
-        }
-      });
-      this.drops = DropList;*/
-      //this.drops = monsterQuery.getMonster(this.monster.name).dropList;
-      //console.log("Drops for " + this.monster.name + ":");
-      //console.log(this.drops);
     },
 
     editItem(item) {

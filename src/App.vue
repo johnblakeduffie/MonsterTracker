@@ -1,300 +1,156 @@
 <template>
   <div id="app">
-    <v-app id="inspire">
+    <v-app  id="inspire">
       <LootViewer :monster="selectedMonster" :monsterDrops="drops" v-model="showLootViewer" />
-      <v-toolbar id="monsterTitle">
+      <v-toolbar color="#1f263c" id="monsterTitle">
         <v-row>
           <v-toolbar-title class="ma-2" text>MONSTERTRACKER</v-toolbar-title>
           <v-spacer></v-spacer>
           <v-btn class="ma-2" text>Home</v-btn>
-          <v-btn class="ma-2" text :disabled="true">Trending Monsters</v-btn>
-          <v-btn class="ma-2" id="collectMonsters" @click="getMonsters" text :disabled="true">Minigames</v-btn>
+          <v-btn class="ma-2" id="collectMonsters" @click="getMonsters" text :disabled="true">Trending Monsters</v-btn>
+          <v-btn class="ma-2"  text :disabled="true">Minigames</v-btn>
         </v-row>
       </v-toolbar>
-      <v-parallax id="jadParallax" height="400" dark src="./assets/hydra.png">
-        <v-row align="center" justify="center">
-          <v-col class="justify-center" id="titleBlock" cols="12">
-            <h1 class="display-1 font-weight-thin mb-4" id="monstertracker">MONSTERTRACKER</h1>
-            <h4 class="subheading" id="subheading"> Discover the most profitable monsters in OSRS </h4>
+
+      <v-row>
+        <nav>
+          <v-navigation-drawer color="#1f263c" v-model="drawer" id="navDrawer" class="mx-auto" :width="200" dark permanent>
+            <v-list nav>
+              <v-list-item :disabled="true" router to="/">
+                  <v-icon color="blue" left>mdi-view-dashboard</v-icon>
+                  <span>Dashboard</span>
+              </v-list-item>
+              <v-divider color="#15182a"></v-divider>
+
+              <v-list-item :disabled="true" router to="/">
+                  <v-icon color="blue" left>mdi-view-list</v-icon>
+                  <span>Loot Viewer</span>
+              </v-list-item>
+              <v-divider color="#15182a"></v-divider>
+
+              <v-list-item :disabled="true" router to="/">
+                  <v-icon color="blue" left>mdi-chart-line</v-icon>
+                  <span >Historical Data</span>
+              </v-list-item>
+              <v-divider color="#15182a"></v-divider>
+
+              <v-list-item :disabled="true" router to="/">
+                  <v-icon color="blue" left>mdi-information</v-icon>
+                  <span>Monster Stats</span>
+              </v-list-item>
+            </v-list>
+          </v-navigation-drawer>
+        </nav>
+
+        <v-col >
+            <v-container fluid>
+              <div  class="search-wrapper">
+                <v-toolbar color="#1f263c">
+                  <input type="text" class="searchBar" v-model="search" placeholder="Search Monsters"/>
+                  <v-spacer></v-spacer>
+                  <v-btn class="ma-2" color="blue" outlined>Filters</v-btn>
+                  <v-btn class="ma-2" color="blue" :disabled="visibleMonsters<=monstersPerPage" @click.stop="decrementMonsters">Previous</v-btn>
+                  <v-btn class="ma-2" color="blue" @click.stop="incrementMonsters">Next</v-btn>
+                </v-toolbar>
+              </div>
+
+              <v-row>
+                  <v-col v-for="monster in filteredList" :key="monster.name" :cols="2">
+                    <v-card color="#1f263c" class="card" id="monsterCard" dark max-width="250" height="360">
+                      <v-img
+                        :src="getImage(monster.name)"
+                        class="white--text align-end"
+                        gradient="to bottom, rgba(0,0,0,.3), rgba(0,0,0,.5)"
+                        background="white"
+                        height="215px"
+                        max-width="250px"
+                      ></v-img>
+
+                      <v-divider></v-divider>
+
+                      <v-flex text-xs-center>
+                        <h1 id="monsterName" class="monsterName" v-text="monster.name"></h1>
+                      </v-flex>
+
+                      <v-chip id="incomeChip" color="green accent-4" outlined pill>+{{Number(monster.grossIncomePerKill).toLocaleString()}}</v-chip>
+
+                      <v-card-actions>
+                        <v-flex text-xs-center>
+                          <v-btn color="light-blue darken-2" v-on:click="getMonsterDrops(monster.name)" @click.stop="selectedMonster = monster" width="150">View Loot</v-btn>
+                        </v-flex>
+                      </v-card-actions>
+                    </v-card>
+                  </v-col>
+              </v-row>
+            </v-container>
           </v-col>
-        </v-row>
-      </v-parallax>
+      </v-row>
 
-      <v-card id="infoCard" width="1400" class="mx-auto" justify="center" align="center" >
-        <v-container fluid>
-          <div class="search-wrapper">
-            <v-toolbar>
-              <v-spacer></v-spacer>
-              <input type="text" placeholder="Enter Total Kills.." />
-              <v-spacer></v-spacer>
-              <input type="text" v-model="search" placeholder="Search Monster.." />
-              <v-spacer></v-spacer>
-              <v-btn class="ma-2" outlined :disabled="true">Filters</v-btn>
-              <v-spacer></v-spacer>
-            </v-toolbar>
-          </div>
-
-          <v-row>
-            <v-col v-for="monster in monsterList" :key="monster.name" :cols="2">
-              <v-card class="card" id="monsterCard" dark max-width="250">
-                <v-img
-                  :src="getImage(monster.name)"
-                  class="white--text align-end"
-                  gradient="to bottom, rgba(0,0,0,.1), rgba(0,0,0,.5)"
-                  height="160px"
-                  max-width="250px"
-                ></v-img>
-
-                <v-divider></v-divider>
-
-                <v-flex text-xs-center>
-                  <h1 id="monsterName" class="monsterName" v-text="monster.name"></h1>
-                </v-flex>
-
-                <v-chip id="incomeChip" color="green" outlined pill>+{{Number(monster.grossIncomePerKill).toLocaleString()}}</v-chip>
-
-                
-
-                <v-card-actions>
-                  <v-flex text-xs-center>
-                    <v-btn outlined v-on:click="getMonsterDrops(monster.name)" @click.stop="selectedMonster = monster" width="150">View Loot</v-btn>
-                  </v-flex>
-                </v-card-actions>
-              </v-card>
-            </v-col>
-          </v-row>
-
-          <scroll-loader :loader-method="getImagesInfo" :loader-disable="disable"></scroll-loader>
-
-        </v-container>
-      </v-card>
     </v-app>
   </div>
 </template>
 
 
 <script type="text/javascript">
-class Monster {
-  constructor(name, src, grossIncomePerKill, dropList) {
-    this.name = name;
-    this.src = src;
-    this.grossIncomePerKill = grossIncomePerKill;
-    this.dropList = dropList;
-  }
-}
+// class Monster {
+//   constructor(name, src, grossIncomePerKill, dropList) {
+//     this.name = name;
+//     this.src = src;
+//     this.grossIncomePerKill = grossIncomePerKill;
+//     this.dropList = dropList;
+//   }
+// }
 
 import LootViewer from "./components/LootViewer";
-import ScrollLoader from "vue-scroll-loader";
-import axios from "axios";
-import Vue from "vue";
 import monsterImages from "@/assets/monsterList.json";
 
-
-Vue.use(ScrollLoader);
 
 export default {
   created() {
     
   },
   
-  data: () => ({
-    //scroll loader data
-    loadMore: true,
-    page: 1,
-    pageSize: 30,
-    images: [],
-    masks: [],
-
-    selectedMonster: {},
-    killCount: 1,
-    showLootViewer: false,
-    itemPrices: {},
-    search: '',
-    drops: [],
-    monsterList: [
-      new Monster(
-        "Zulrah",
-        "https://oldschool.runescape.wiki/images/b/bc/Zulrah_%28serpentine%29.png?29a54",
-        10000000
-      ),
-      new Monster(
-        "Cerberus",
-        "https://oldschool.runescape.wiki/images/4/45/Cerberus.png?47f4c",
-        5000000
-      ),
-      new Monster(
-        "Skotizo",
-        "https://oldschool.runescape.wiki/images/a/a8/Skotizo.png?dc8b8",
-        4000000
-      ),
-      new Monster(
-        "Zalcano",
-        "https://oldschool.runescape.wiki/images/3/30/Zalcano.png?6244d",
-        3500000
-      ),
-      new Monster(
-        "Vorkath",
-        "https://oldschool.runescape.wiki/images/6/6d/Vorkath%27s_head_detail.png?e82eb",
-        3000000
-      ),
-      new Monster(
-        "Alchemical Hydra",
-        "https://oldschool.runescape.wiki/images/a/a3/Alchemical_Hydra.png?925dd",
-        2500000
-      ),
-      new Monster(
-        "Something",
-        "https://oldschool.runescape.wiki/images/6/6d/Vorkath%27s_head_detail.png?e82eb",
-        2000000
-      ),
-      new Monster(
-        "Zulrah",
-        "https://oldschool.runescape.wiki/images/b/bc/Zulrah_%28serpentine%29.png?29a54",
-        10000000
-      ),
-      new Monster(
-        "Cerberus",
-        "https://oldschool.runescape.wiki/images/4/45/Cerberus.png?47f4c",
-        5000000
-      ),
-      new Monster(
-        "Skotizo",
-        "https://oldschool.runescape.wiki/images/a/a8/Skotizo.png?dc8b8",
-        4000000
-      ),
-      new Monster(
-        "Zalcano",
-        "https://oldschool.runescape.wiki/images/3/30/Zalcano.png?6244d",
-        3500000
-      ),
-      new Monster(
-        "Vorkath",
-        "https://oldschool.runescape.wiki/images/6/6d/Vorkath%27s_head_detail.png?e82eb",
-        3000000
-      ),
-      new Monster(
-        "Alchemical Hydra",
-        "https://oldschool.runescape.wiki/images/a/a3/Alchemical_Hydra.png?925dd",
-        2500000
-      ),
-      new Monster(
-        "Something",
-        "https://oldschool.runescape.wiki/images/6/6d/Vorkath%27s_head_detail.png?e82eb",
-        2000000
-      ),
-      new Monster(
-        "Zulrah",
-        "https://oldschool.runescape.wiki/images/b/bc/Zulrah_%28serpentine%29.png?29a54",
-        10000000
-      ),
-      new Monster(
-        "Cerberus",
-        "https://oldschool.runescape.wiki/images/4/45/Cerberus.png?47f4c",
-        5000000
-      ),
-      new Monster(
-        "Skotizo",
-        "https://oldschool.runescape.wiki/images/a/a8/Skotizo.png?dc8b8",
-        4000000
-      ),
-      new Monster(
-        "Zalcano",
-        "https://oldschool.runescape.wiki/images/3/30/Zalcano.png?6244d",
-        3500000
-      ),
-      new Monster(
-        "Vorkath",
-        "https://oldschool.runescape.wiki/images/6/6d/Vorkath%27s_head_detail.png?e82eb",
-        3000000
-      ),
-      new Monster(
-        "Alchemical Hydra",
-        "https://oldschool.runescape.wiki/images/a/a3/Alchemical_Hydra.png?925dd",
-        2500000
-      ),
-      new Monster(
-        "Something",
-        "https://oldschool.runescape.wiki/images/6/6d/Vorkath%27s_head_detail.png?e82eb",
-        2000000
-      ),
-      new Monster(
-        "Zulrah",
-        "https://oldschool.runescape.wiki/images/b/bc/Zulrah_%28serpentine%29.png?29a54",
-        10000000
-      ),
-      new Monster(
-        "Cerberus",
-        "https://oldschool.runescape.wiki/images/4/45/Cerberus.png?47f4c",
-        5000000
-      ),
-      new Monster(
-        "Skotizo",
-        "https://oldschool.runescape.wiki/images/a/a8/Skotizo.png?dc8b8",
-        4000000
-      ),
-      new Monster(
-        "Zalcano",
-        "https://oldschool.runescape.wiki/images/3/30/Zalcano.png?6244d",
-        3500000
-      ),
-      new Monster(
-        "Vorkath",
-        "https://oldschool.runescape.wiki/images/6/6d/Vorkath%27s_head_detail.png?e82eb",
-        3000000
-      ),
-      new Monster(
-        "Alchemical Hydra",
-        "https://oldschool.runescape.wiki/images/a/a3/Alchemical_Hydra.png?925dd",
-        2500000
-      ),
-      new Monster(
-        "Something",
-        "https://oldschool.runescape.wiki/images/6/6d/Vorkath%27s_head_detail.png?e82eb",
-        2000000
-      )
-    ],
-  }),
+  data() {
+    return {
+      selectedMonster: {},
+      killCount: 1,
+      showLootViewer: false,
+      itemPrices: {},
+      search: '',
+      visibleMonsters: 12,
+      monstersPerPage: 12,
+      drops: [],
+      monsterList: []
+    }
+  },
   components: {
     LootViewer,
   },
   computed: {
-    // filteredList() {
-    //   return this.monsterList.filter(monster => {
-    //     return monster.name.toLowerCase().includes(this.search.toLowerCase());
-    //   });
-    // }
+    filteredList: function(){
+      var visibleMonsters = this.visibleMonsters;
+      var monstersPerPage = this.monstersPerPage;
+      var search = this.search;
+      return this.monsterList.filter(function(monster, index) {
+        if (search != '') {
+          return monster.name.toLowerCase().includes(search.toLowerCase());
+        } else {
+          return index <= visibleMonsters - 1 && index >= visibleMonsters - monstersPerPage; 
+        }
+      });
+    }
   },
 
   methods: {
+    decrementMonsters() {
+      this.visibleMonsters -= this.monstersPerPage;
+    },
+    incrementMonsters() {
+      this.visibleMonsters += this.monstersPerPage;
+    },
     getImage(name) {
       return monsterImages[name];
     },
-    getImagesInfo() {
-      axios
-        .get("http://localhost:8000/sortedProfit/", {
-          params: {
-            page: this.page++,
-            per_page: this.pageSize,
-            //client_id: 'e874834b096dcd107c232fe4b0bb521158b62e486580c988b0a75cb0b77a2abe'
-          },
-        })
-        .then((res) => {
-          //this.images.concat(res.data)
-          //this.images.push("https://oldschool.runescape.wiki/images/6/6d/Vorkath%27s_head_detail.png?e82eb")
-          // Stop scroll-loader
-          //res.data.length < this.pageSize && (this.loadMore = false)
-          res.data && (this.images = [...this.images, ...res.data]);
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-    },
-    watch: {
-      page(value) {
-        this.disable = value > 10;
-      },
-    },
-
     getMonsters: function () {
      fetch("http://localhost:8000/sortedProfit/")
       .then((response) => response.json())
@@ -303,17 +159,12 @@ export default {
       });
     },
     getMonsterDrops: function (name) {
-      // var monster = {};
-      // monster = monsterQuery.getMonster(name);
-      // console.log(monster);
-      // return monster.dropList;
       fetch("http://localhost:8000/monster/" + name + "/")
         .then((response) => response.json())
         .then((data) => {
           console.log(data.dropList);
           this.drops = data.dropList;
           this.showLootViewer = true;
-          //return data.dropList;
         });
     },
     checkMonsters: function () {
@@ -322,23 +173,29 @@ export default {
   },
   mounted() {
     this.getMonsters();
-    this.getImagesInfo();
   },
 };
 </script>
 
 <style lang="scss">
-//Scroll Loader
-// .card {
-//   animation-duration: 1s;
-//   animation-fill-mode: both;
-//   animation-name: fadeInUp;
-// }
 
+.searchBar {
+  width: 400px;
+  background-color: #101220;
+}
+
+.totalKillsBar {
+  width: 200px;
+  background-color: #15182a;
+}
+
+#inspire {
+  background-color: #151620;
+}
 
 
 body {
-  background-color: black;
+  background-color:#151620;
   font-family: "Roboto", sans-serif;
   text-align: center;
   font-weight: 300;
@@ -346,8 +203,7 @@ body {
 }
 
 #infoCard {
-  background-color: black;
-  margin-top: 0.55rem;
+  margin-top: 1.55rem;
 }
 
 #incomeChip {
@@ -358,14 +214,21 @@ body {
   margin-bottom: 0.55rem;
 }
 
+#navDrawer {
+  margin-top: .8rem;
+}
+
 .monsterName {
-  margin-top: 0.55rem;
+  margin-top: .55rem;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 .v-chip {
+  color:#15182a;
   margin-top: 0.55rem;
   margin-right: 0.2rem;
-  
 }
 
 input {
@@ -395,7 +258,6 @@ input {
   margin-top: 0.3rem;
   font-size: 10px;
   animation-duration: 1s;
-  //animation-fill-mode: both;
   animation-name: fadeInUp;
   transition: .15s all ease-in-out;
   &:hover {
@@ -413,8 +275,7 @@ input {
 }
 
 #monsterTitle {
-  margin-top: 1.5rem;
-  //margin-bottom: 0.55rem;
+  margin-top: 1.0rem;
   font-size: 20px;
 }
 </style>
