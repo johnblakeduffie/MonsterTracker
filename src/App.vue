@@ -17,25 +17,25 @@
           <v-navigation-drawer color="#1f263c" v-model="drawer" id="navDrawer" class="mx-auto" :width="200" dark permanent>
             <v-list nav>
               <v-list-item :disabled="true" router to="/">
-                  <v-icon color="blue" left>mdi-view-dashboard</v-icon>
+                  <v-icon class="listIcons" color="blue" left>mdi-view-dashboard</v-icon>
                   <span>Dashboard</span>
               </v-list-item>
               <v-divider color="#15182a"></v-divider>
 
               <v-list-item :disabled="true" router to="/">
-                  <v-icon color="blue" left>mdi-view-list</v-icon>
+                  <v-icon class="listIcons" color="blue" left>mdi-view-list</v-icon>
                   <span>Loot Viewer</span>
               </v-list-item>
               <v-divider color="#15182a"></v-divider>
 
               <v-list-item :disabled="true" router to="/">
-                  <v-icon color="blue" left>mdi-chart-line</v-icon>
-                  <span >Historical Data</span>
+                  <v-icon class="listIcons" color="blue" left>mdi-chart-line</v-icon>
+                  <span>History</span>
               </v-list-item>
               <v-divider color="#15182a"></v-divider>
 
               <v-list-item :disabled="true" router to="/">
-                  <v-icon color="blue" left>mdi-information</v-icon>
+                  <v-icon class="listIcons" color="blue" left>mdi-information</v-icon>
                   <span>Monster Stats</span>
               </v-list-item>
             </v-list>
@@ -178,6 +178,10 @@ export default {
 </script>
 
 <style lang="scss">
+
+.listIcons {
+  margin-left: .55rem;
+}
 
 .searchBar {
   width: 400px;
