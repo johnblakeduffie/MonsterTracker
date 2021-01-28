@@ -152,14 +152,14 @@ export default {
       return monsterImages[name];
     },
     getMonsters: function () {
-     fetch("http://localhost:8000/sortedProfit/")
+     fetch("https://monstertracker-api.herokuapp.com/sortedProfit/")
       .then((response) => response.json())
       .then((data) => {
         this.monsterList = data;
       });
     },
     getMonsterDrops: function (name) {
-      fetch("http://localhost:8000/monster/" + name + "/")
+      fetch("https://monstertracker-api.herokuapp.com/monster/" + name + "/")
         .then((response) => response.json())
         .then((data) => {
           console.log(data.dropList);
