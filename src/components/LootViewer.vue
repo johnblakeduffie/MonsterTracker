@@ -109,7 +109,7 @@ export default {
     ],
     drops: [],
     mounted() {
-      fetch('http://localhost:8000/monster/' + name + '/')
+      fetch('https://monstertracker-api.herokuapp.com/monster/' + name + '/')
         .then(response => response.json())
         .then((data) => {
         this.drops = data.dropList;

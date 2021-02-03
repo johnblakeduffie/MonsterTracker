@@ -56,7 +56,7 @@
 
               <v-row>
                   <v-col v-for="monster in filteredList" :key="monster.name" :cols="2">
-                    <v-card color="#1f263c" class="card" id="monsterCard" dark max-width="250" height="360">
+                    <v-card :href="getLink(monster.name)" color="#1f263c" class="card" id="monsterCard" dark max-width="250" height="360">
                       <v-img
                         :src="getImage(monster.name)"
                         class="white--text align-end"
@@ -76,7 +76,7 @@
 
                       <v-card-actions>
                         <v-flex text-xs-center>
-                          <v-btn color="light-blue darken-2" v-on:click="getMonsterDrops(monster.name)" @click.stop="selectedMonster = monster" width="150">View Loot</v-btn>
+                          <v-btn color="light-blue darken-2" v-on:click.prevent="getMonsterDrops(monster.name)" @click.stop="selectedMonster = monster" width="150">View Loot</v-btn>
                         </v-flex>
                       </v-card-actions>
                     </v-card>
@@ -148,8 +148,12 @@ export default {
     incrementMonsters() {
       this.visibleMonsters += this.monstersPerPage;
     },
+    getLink(name) {
+      return monsterImages[name]["wiki_url"];
+    },
     getImage(name) {
-      return monsterImages[name];
+      console.log(monsterImages[name]["src"]);
+      return monsterImages[name]["src"];
     },
     getMonsters: function () {
      fetch("https://monstertracker-api.herokuapp.com/sortedProfit/")
